@@ -12,3 +12,4 @@
 - import_tasks: common_tasks.yml
 - import_tasks: rocky.yml
 - import_tasks: debian.yml
+- import_tasks: services.yml

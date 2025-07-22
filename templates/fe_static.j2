@@ -1,0 +1,33 @@
+server {
+  {{ nginx_listen_ports | indent(2, false) }}
+  server_name {{ domain }};
+  access_log /var/log/nginx/{{ domain }}-access.log main;
+  error_log /var/log/nginx/{{ domain }}-error.log;
+  root {{ nginx_app_dir }};
+
+  {{ nginx_ssl_conf | indent(2, false) }}
+
+  # headers
+  add_header Strict-Transport-Security "max-age=63072000" always;
+  add_header  X-Frame-Options "SAMEORIGIN" always;
+  add_header X-Content-Type-Options "nosniff" always;
+  add_header Referrer-Policy "strict-origin" always;
+  add_header Content-Security-Policy "default-src * data: blob: ; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com 'unsafe-inline'; font-src https://fonts.gstatic.com 'self' data:; script-src blob: https://cdnjs.cloudflare.com  https://www.googletagmanager.com https://www.google-analytics.com/analytics.js https://maps.googleapis.com https://www.google.com/recaptcha/api.js https://www.gstatic.com 'self' 'unsafe-inline' 'unsafe-eval'" always;
+  add_header Permissions-Policy "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()" always;
+  ssl_session_cache shared:TLS:2m;
+
+  location / {
+    add_header  Cache-Control "no-store, no-cache, must-revalidate";
+    try_files   $uri $uri/ /index.html;
+    index       index.html;
+    error_page  403 404 502 503 504  index.html;
+  }
+
+  location ~* \.(js|jpg|jpeg|gif|png|svg|css)$ {
+    add_header Cache-Control "max-age=31536000, public";
+    try_files   $uri $uri/ /index.html;
+    index       index.html;
+    error_page  403 404 502 503 504  index.html;
+  }
+
+}

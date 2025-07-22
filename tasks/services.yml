@@ -1,0 +1,30 @@
+---
+##### NGINX
+- name: reload nginx service
+  systemd:
+    name: nginx
+    state: reloaded
+  become: true
+  tags: reload_nginx
+
+- name: restart nginx service
+  systemd:
+    name: nginx
+    state: restarted
+  become: true
+  tags: restart_nginx
+
+- name: start nginx service
+  systemd:
+    name: nginx
+    state: started
+  become: true
+  tags: configure_nginx
+  
+- name: enable nginx service
+  systemd:
+    name: nginx
+    enabled: true
+  become: true
+  tags: configure_nginx
+  

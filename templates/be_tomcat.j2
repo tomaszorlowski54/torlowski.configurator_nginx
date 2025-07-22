@@ -1,0 +1,87 @@
+map $http_origin $xallow_origin_{{ domain|replace('-','_')|replace('.','_') }}  {
+    default "";
+    ~^(https?://(.+\.)?(localhost:80))$ $1;
+    ~^(https?://(.+\.)?(localhost:4200))$ $1;
+    ~^(https?://{{ domain | replace('-api.', '.') }})$ $1;
+}
+
+server {
+  listen 80;
+  listen 443 ssl;
+  server_name {{ domain }};
+  access_log /var/log/nginx/{{ domain }}-access.log main;
+  error_log /var/log/nginx/{{ domain }}-error.log;
+
+  {{ nginx_ssl_conf | indent(2, false) }}
+
+# headers
+  add_header Strict-Transport-Security "max-age=63072000" always;
+  add_header  X-Frame-Options "SAMEORIGIN" always;
+  add_header X-Content-Type-Options "nosniff" always;
+  add_header Referrer-Policy "strict-origin" always;
+  add_header Content-Security-Policy "default-src *; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'" always;
+  add_header Permissions-Policy "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()" always;
+
+  location /manager {
+    deny all;
+    return 403;
+  }
+
+  location /host-manager {
+    deny all;
+    return 403;
+  }
+
+  location /examples {
+    deny all;
+    return 403;
+  }
+
+  location /docs {
+    deny all;
+    return 403;
+  }
+
+  location / {
+    set $cors_origin $xallow_origin_{{ domain|replace('-','_')|replace('.','_') }};
+
+    # Ensure a fallback in case the map doesn't return a value
+    if ($cors_origin = "") {
+        set $cors_origin "{{ domain | replace('-api.', '.') }}";
+    }
+    if ($request_method = 'OPTIONS') {
+      add_header "Access-Control-Allow-Origin" $cors_origin  always;
+      add_header "Access-Control-Allow-Methods" "POST, GET, OPTIONS, PUT, DELETE" always;
+      add_header "Access-Control-Allow-Headers" "Content-Type, Accept, Authorization, fg-api-key" always;
+      add_header 'Access-Control-Allow-Credentials' 'true' always;
+      add_header 'Access-Control-Max-Age' 1728000;
+      add_header 'Content-Type' 'text/plain charset=UTF-8';
+      add_header 'Content-Length' 0;
+      return 200;
+    }
+    if ($request_method = 'POST') {
+      add_header "Access-Control-Allow-Origin" $cors_origin  always;
+      add_header "Access-Control-Expose-Headers" "Content-Length, Content-Disposition" always;
+      add_header 'Access-Control-Allow-Credentials' 'true' always;
+    }
+    if ($request_method = 'GET') {
+      add_header "Access-Control-Allow-Origin" $cors_origin  always;
+      add_header "Access-Control-Expose-Headers" "Content-Length, Content-Disposition" always;
+      add_header 'Access-Control-Allow-Credentials' 'true' always;
+    }
+    if ($request_method = 'DELETE') {
+      add_header "Access-Control-Allow-Origin" $cors_origin  always;
+      add_header "Access-Control-Expose-Headers" "Content-Length, Content-Disposition" always;
+      add_header 'Access-Control-Allow-Credentials' 'true' always;
+    }
+    if ($request_method = 'PUT') {
+      add_header "Access-Control-Allow-Origin" $cors_origin  always;
+      add_header "Access-Control-Expose-Headers" "Content-Length, Content-Disposition" always;
+      add_header 'Access-Control-Allow-Credentials' 'true' always;
+    }
+
+
+  {{ nginx_proxy_pass | indent(2, false) }}
+
+  }
+}

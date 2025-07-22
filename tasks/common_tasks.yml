@@ -1,1 +1,22 @@
 ---
+- name: send nginx fe static config
+  template:
+    src: fe_static.j2
+    dest: "{{ nginx_conf_dir }}/{{ domain }}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+  become: true
+  tags: standard_front_static
+
+- name: send nginx be tomcat config
+  template:
+    src: be_tomcat.j2
+    dest: "{{ nginx_conf_dir }}/{{ domain }}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+  become: true
+  tags: standard_be_tomcat
