@@ -1,0 +1,19 @@
+---
+# tasks file for torlowski.configurator_nginx
+
+#################################################
+#               load os tasks                   #
+#################################################
+
+- name: 'load os task'
+  stat:
+    path: '{{ role_path }}/tasks/{{ ansible_distribution|lower }}.yml'
+  register: stat_os_task_file
+  delegate_to: localhost
+  connection: local
+  tags: always
+
+- name: 'include OS tasks'
+  include_tasks: '{{ ansible_distribution|lower }}.yml'
+  when: stat_os_task_file.stat.exists
+  tags: always

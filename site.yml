@@ -1,0 +1,5 @@
+# ansible-playbook /etc/ansible/roles/torlowski.configurator_nginx/site.yml -u root -t "standard" -l rocky
+- hosts: 'all'
+  become: true
+  roles:
+    - role: ../torlowski.configurator_nginx

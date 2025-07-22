@@ -1,0 +1,14 @@
+---
+# tasks file for torlowski.configurator_nginx
+- name: 'include loader-variable.yml'
+  include_tasks: loader-variable.yml
+  tags: always
+
+- name: 'include loader-os.yml'
+  include_tasks: loader-os.yml
+  tags: always
+
+# custom logic
+- import_tasks: common_tasks.yml
+- import_tasks: rocky.yml
+- import_tasks: debian.yml
