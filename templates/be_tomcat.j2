@@ -51,7 +51,7 @@ server {
     }
     if ($request_method = 'OPTIONS') {
       add_header "Access-Control-Allow-Origin" $cors_origin  always;
-      add_header "Access-Control-Allow-Methods" "POST, GET, OPTIONS, PUT, DELETE" always;
+      add_header "Access-Control-Allow-Methods" "POST, GET, OPTIONS, PUT, DELETE, PATCH" always;
       add_header "Access-Control-Allow-Headers" "Content-Type, Accept, Authorization, fg-api-key" always;
       add_header 'Access-Control-Allow-Credentials' 'true' always;
       add_header 'Access-Control-Max-Age' 1728000;
@@ -78,6 +78,11 @@ server {
       add_header "Access-Control-Allow-Origin" $cors_origin  always;
       add_header "Access-Control-Expose-Headers" "Content-Length, Content-Disposition" always;
       add_header 'Access-Control-Allow-Credentials' 'true' always;
+    }
+    if ($request_method = 'PATCH') {
+      add_header "Access-Control-Allow-Origin" $cors_origin always;
+      add_header "Access-Control-Expose-Headers" "Content-Length, Content-Disposition" always;
+      add_header "Access-Control-Allow-Credentials" "true" always;
     }
 
 
